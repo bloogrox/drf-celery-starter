@@ -1,0 +1,14 @@
+Django==2.2.2
+django-cors-headers==3.0.2
+django-filter==2.1.0
+django-picklefield==2.0
+django-rest-swagger==2.2.0
+djangorestframework==3.9.4
+pyyaml==5.1.1
+dj-database-url==0.5.0
+flake8==3.7.7
+gunicorn==19.9.0
+psycopg2-binary==2.8.2
+whitenoise==4.1.2
+redis==3.2.1
+celery==4.3.0

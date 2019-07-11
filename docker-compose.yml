@@ -1,0 +1,66 @@
+version: '2'
+
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: bloogrox/drf-celery-starter
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./src:/app
+    ports:
+      - 8000:8000
+    environment:
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: "postgresql://postgres:postgres@postgres/postgres"
+      REDIS_URL: "redis://redis"
+    depends_on:
+      - postgres
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: bloogrox/drf-celery-starter
+    command: celery -A project._celery:_celery worker -l INFO
+    volumes:
+      - ./src:/app
+    environment:
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: "postgresql://postgres:postgres@postgres/postgres"
+      REDIS_URL: "redis://redis"
+    depends_on:
+      - postgres
+      - redis
+
+  clock:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: bloogrox/drf-celery-starter
+    command: celery -A project._celery:_celery beat -l INFO
+    volumes:
+      - ./src:/app
+    environment:
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: "postgresql://postgres:postgres@postgres/postgres"
+      REDIS_URL: "redis://redis"
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: "postgres:alpine"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+
+  redis:
+    image: "redis:alpine"
